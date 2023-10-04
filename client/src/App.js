@@ -12,6 +12,7 @@ import NewPlace from "./places/pages/NewPlace";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
 import UsersPlaces from "./places/pages/UsersPlaces";
 import UpdatePlace from "./places/pages/UpdatePlace";
+import Auth from "./user/pages/Auth";
 
 // all this is needed for the routing in react
 // First need the <Router> tag and then the Switch in order to choose which pahe I want to go
@@ -38,6 +39,9 @@ const App = () => {
 
           <Route path="/places/:placeId" exact>
             <UpdatePlace />
+          </Route>
+          <Route path="/auth" exact>
+            <Auth />
           </Route>
 
           <Redirect to="/" />
