@@ -1,8 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
+import Card from "../../shared/components/UIElements/Card";
+
 import {
   VALIDATOR_MINLENGTH,
   VALIDATOR_REQUIRE,
@@ -57,6 +59,7 @@ const DUMMY_PLACES = [
 // need to be carefully in the order that I initialize the functions
 
 const UpdatePlace = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const placeId = useParams().placeId;
 
   const [formState, inputHandler, setFormData] = useForm(
@@ -76,19 +79,22 @@ const UpdatePlace = () => {
   const identifiedPlaced = DUMMY_PLACES.find((p) => p.id === placeId);
 
   useEffect(() => {
-    setFormData(
-      {
-        title: {
-          value: identifiedPlaced.title,
-          isValid: true,
+    if (identifiedPlaced) {
+      setFormData(
+        {
+          title: {
+            value: identifiedPlaced.title,
+            isValid: true,
+          },
+          description: {
+            value: identifiedPlaced.description,
+            isValid: true,
+          },
         },
-        description: {
-          value: identifiedPlaced.description,
-          isValid: true,
-        },
-      },
-      true
-    );
+        true
+      );
+    }
+    setIsLoading(false);
   }, [setFormData, identifiedPlaced]);
 
   const placeUpdateSubmitHandler = (event) => {
@@ -99,17 +105,19 @@ const UpdatePlace = () => {
   if (!identifiedPlaced) {
     return (
       <div className="center">
-        <h2>Could not find the place</h2>
+        <Card>
+          <h2>Could not find the place</h2>
+        </Card>
       </div>
     );
   }
 
-  if(!formState.inputs.title.value){
+  if (!formState.inputs.title.value) {
     return (
-        <div className="center">
-          <h2>Loading...</h2>
-        </div>
-      );
+      <div className="center">
+        <h2>Loading...</h2>
+      </div>
+    );
   }
   return (
     <form className="place-form" onSubmit={placeUpdateSubmitHandler}>
@@ -134,6 +142,7 @@ const UpdatePlace = () => {
         initialValue={formState.inputs.description.value}
         initialValid={formState.inputs.description.isValid}
       />
+
       <Button type="submit" disabled={!formState.isValid}>
         Update Place
       </Button>
