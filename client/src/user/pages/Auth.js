@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 
 import "./Auth.css";
 import Card from "../../shared/components/UIElements/Card";
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
 import { useForm } from "../../shared/hooks/form-hook";
+import { AuthContext } from "../../shared/context/auth-context";
 import {
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
@@ -12,6 +13,7 @@ import {
 } from "../../shared/util/validators";
 
 const Auth = () => {
+  const auth = useContext(AuthContext);
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [formState, inputHandler, setFormData] = useForm(
     {
@@ -31,8 +33,8 @@ const Auth = () => {
     if (!isLoginMode) {
       setFormData(
         {
-          ...formState.inputs,  
-          name: undefined
+          ...formState.inputs,
+          name: undefined,
         },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
@@ -41,9 +43,9 @@ const Auth = () => {
         {
           ...formState.inputs,
           name: {
-            value: '',
+            value: "",
             isValid: false,
-          }
+          },
         },
         false
       );
@@ -54,6 +56,7 @@ const Auth = () => {
   const authSubmitHandler = (event) => {
     event.preventDefault();
     console.log(formState.inputs);
+    auth.login();
   };
 
   return (
@@ -93,10 +96,10 @@ const Auth = () => {
         <Button type="submit" disabled={!formState.isValid}>
           {isLoginMode ? "Login" : "Sing Up"}
         </Button>
+        <Button inverse onClick={swithModeHandler}>
+          {!isLoginMode ? "Login" : "Sign Up"}
+        </Button>
       </form>
-      <Button inverse onClick={swithModeHandler}>
-        {!isLoginMode ? "Login" : "Sign Up"}
-      </Button>
     </Card>
   );
 };
