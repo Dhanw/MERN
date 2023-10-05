@@ -11,9 +11,11 @@ router.get("/user/:uid");
 
 router.post(
   "/signup",
-  check("name").not().isEmpty(),
-  check("email").normalizeEmail().isEmail(),
-  check("password").isLength({ min: 6 }),
+  [
+    check("name").not().isEmpty(),
+    check("email").normalizeEmail().isEmail(),
+    check("password").isLength({ min: 6 }),
+  ],
   usersController.signup
 );
 
