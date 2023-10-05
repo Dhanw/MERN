@@ -1,18 +1,25 @@
 const express =require('express');
-const body = require('body-parser');
+const bodyParser = require('body-parser');
 
 const placesRoutes = require('./routes/places-routes');
+const HttpError = require('./models/http-error')
 
 const app=express();
 
+app.use(bodyParser.json());
 app.use('/api/places',placesRoutes);
+
+app.use((req,res,next)=>{
+    const error = new HttpError('Could not find route try again, you little btch',404);
+    throw error;
+})
 
 app.use((error,req,res,next)=>{
     if(res.headerSent){
         return next(error);
     }
     res.status(error.code || 500);
-    res.json({message:error.message || 'An unknown error ocurred'});
+    res.json({message:error.message || 'Something that you code crashed, fix it '});
 });
 
 app.listen(5000);
