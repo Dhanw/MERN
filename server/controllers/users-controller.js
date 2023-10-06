@@ -37,7 +37,7 @@ const signup = async (req, res, next) => {
     return next(new HttpError("invalid inputs please try again", 422));
   }
 
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
   let existingUser;
   try {
     existingUser = await User.findOne({ email: email });
@@ -56,7 +56,7 @@ const signup = async (req, res, next) => {
     image:
       "https://www.shutterstock.com/shutterstock/photos/2275817317/display_1500/stock-photo-happy-man-standing-on-road-in-front-of-trees-2275817317.jpg",
     password,
-    places,
+    places:[]
   });
 
   try {
