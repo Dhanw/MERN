@@ -32,7 +32,7 @@ const signup = async (req, res, next) => {
   }
 
   if (existingUser) {
-    const error = new HttpError("Exisitng user, please ologin instead", 422);
+    const error = new HttpError("Exisitng user, please login instead", 422);
     return next(error);
   }
 
