@@ -6,31 +6,6 @@ const Place = require("../models/place");
 const User = require("../models/user");
 const mongoose = require("mongoose");
 
-let DUMMY_PLACES = [
-  {
-    id: "p1",
-    title: "emprire state",
-    description: "fampur",
-    location: {
-      lat: 40.7484474,
-      lng: -73.9871516,
-    },
-    address: "Esta es una direccion",
-    creator: "u1",
-  },
-  {
-    id: "p2",
-    title: "eiffel tower",
-    description: "located in paris",
-    location: {
-      lat: 40.7484474,
-      lng: -73.9871516,
-    },
-    address: "Esta es una direccion",
-    creator: "u2",
-  },
-];
-
 const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
 
