@@ -18,8 +18,15 @@ let DUMMY_USERS = [
   },
 ];
 
-const getUsers = (req, res, next) => {
-  res.json({ users: DUMMY_USERS });
+const getUsers = async (req, res, next) => {
+  let users;
+  try {
+    users = await User.find({}, "-password");
+  } catch (err) {
+    return next(new HttpError("Fetching users failed ,try again later", 500));
+  }
+
+  res.json({users: users.map(user => user.toObject({ getters: true }))});
 };
 
 const signup = async (req, res, next) => {
@@ -27,7 +34,7 @@ const signup = async (req, res, next) => {
 
   if (!error.isEmpty()) {
     console.log(error);
-    next(new HttpError("invalid inputs please try again", 422));
+    return next(new HttpError("invalid inputs please try again", 422));
   }
 
   const { name, email, password, places } = req.body;
@@ -81,7 +88,6 @@ const login = async (req, res, next) => {
     const error = new HttpError("Invalid credentialas  user", 422);
     return next(error);
   }
-
 
   res.json({ message: "Logged in" });
 };
