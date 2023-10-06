@@ -95,6 +95,7 @@ const createPlace = async (req, res, next) => {
       "https://media.istockphoto.com/id/626591042/es/foto/edificio-empire-state-de-la-ciudad-de-nueva-york.jpg?s=612x612&w=is&k=20&c=Vp-AWuYwb3PTM6PjuZrc5WYyo5UAUfGXXovbEa5gtT4=",
     creator,
   });
+
   try {
     await createPlace.save();
   } catch (err) {
@@ -102,7 +103,7 @@ const createPlace = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(201).json({ place: createPlace, places: DUMMY_PLACES });
+  res.status(201).json({ place: createPlace });
 };
 
 const updatePlace = async (req, res, next) => {
@@ -126,23 +127,39 @@ const updatePlace = async (req, res, next) => {
   place.title = title;
   place.description = description;
 
-  try{
+  try {
     await place.save();
-  }catch(err){
+  } catch (err) {
     const error = new HttpError("could not update the place with the ID", 500);
     return next(error);
   }
 
-  res.status(200).json({ place:place.toObject({gatters:true}) });
+  res.status(200).json({ place: place.toObject({ gatters: true }) });
 };
 
-const deletePlace = (req, res, next) => {
+const deletePlace = async (req, res, next) => {
   const placeId = req.params.pid;
-  if (!DUMMY_PLACES.find((p) => p.id === placeId)) {
-    throw new HttpError("Could not find a place for that id.", 404);
+
+  let place;
+  try {
+    place = await Place.findById(placeId);
+  } catch (err) {
+    const error = new HttpError("could not find the place with the ID", 500);
+    return next(error);
   }
 
-  DUMMY_PLACES = DUMMY_PLACES.filter((p) => p.id !== placeId);
+  if (!place) {
+    const error = new HttpError("could not delete the place with the ID", 500);
+    return next(error);
+  }
+
+  try {
+    await place.remove();
+  } catch (err) {
+    const error = new HttpError("could not delete the place with the ID", 500);
+    return next(error);
+  }
+
   res.status(200).json({ message: "place deleted yeah!!" });
 };
 
