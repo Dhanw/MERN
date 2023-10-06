@@ -1,18 +1,53 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import UsersList from "../components/UserList";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 
-const Users =()=>{
-    // This is dummy data to work with at first
-    const USERS=[
-        {
-            id: 'u1',
-            name:'Maximun Vergonhio',
-            image:'https://media.istockphoto.com/id/1322913815/es/foto/joven-barbudo-de-negocios-sentado-en-el-escritorio-y-posando.jpg?s=1024x1024&w=is&k=20&c=Do2AxEzLFXjkIm1FPCweWcCe2XKdKWCjcl8eOWngIzg=',
-            places: 3  
+const Users = () => {
+  // This is dummy data to work with at first
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
+  const [loadedUsers, setLoadedUsers] = useState();
+
+  useEffect(() => {
+
+    const sendRequest = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch("http://localhost:5000/api/users");
+        const responseData = await response.json();
+
+        if (!response.ok) {
+          throw new Error(responseData.message);
         }
-        ];
-    
-    return <UsersList items={USERS} />
+
+        setLoadedUsers(responseData.users);
+        console.log(responseData.users);
+      } catch (error) {
+        setError(error.message);
+      }
+      setIsLoading(false);
+    };
+
+    sendRequest();
+  }, []);
+
+  const errorHandler = () => {
+    setError(null);
+  };
+
+  return (
+    <React.Fragment>
+      <ErrorModal error={error} onClear={errorHandler} />
+      {isLoading && (
+        <div className="center">
+          <LoadingSpinner />
+        </div>
+      )}
+      { !isLoading && loadedUsers && <UsersList items={loadedUsers} />}
+    </React.Fragment>
+  );
 };
 
 export default Users;
