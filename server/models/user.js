@@ -6,7 +6,7 @@ const userSchema = new Schema({
   email: { type: String, requires: true,  unique:true},
   password: { type: String, requires: true,  minlength:6 },
   image:{type:String,require:true},
-  places:[{type:mongoose.Types.ObjectId ,require:true, ref:'Places'}]
+  places:[{type:mongoose.Types.ObjectId ,require:true, ref:'Place'}]
 });
 
 userSchema.plugin(uniqueValidator);
