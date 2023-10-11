@@ -16,14 +16,14 @@ export const useHttpClient = () => {
           method,
           body,
           headers,
-          signal: httpAbortCtrl.signal,
+ //         signal: httpAbortCtrl.signal,
         });
 
         const responseData = await response.json();
 
-        activeHttpRequest.current = activeHttpRequest.current.filter(
-          (reqCtrl) => reqCtrl !== httpAbortCtrl
-        );
+        // activeHttpRequest.current = activeHttpRequest.current.filter(
+        //   (reqCtrl) => reqCtrl !== httpAbortCtrl
+        // );
 
         if (!response.ok) {
           throw new Error(responseData.message);
@@ -35,18 +35,17 @@ export const useHttpClient = () => {
         setIsLoading(false);
         throw error;
       }
-    },
-    []
-  );
+    },[]);
 
   const clearError = () => {
     setError(null);
   };
 
-  useEffect(() => {
-    return () => {
-      activeHttpRequest.current.forEach((abortCtrl) => abortCtrl.abort());
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     activeHttpRequest.current.forEach((abortCtrl) => abortCtrl.abort());
+  //   };
+  // }, []);
+
   return { isLoading, error, sendRequest, clearError };
 };

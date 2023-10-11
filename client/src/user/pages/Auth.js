@@ -62,7 +62,7 @@ const Auth = () => {
 
     if (isLoginMode) {
       try {
-        await sendRequest(
+        const responseData = await sendRequest(
           "http://localhost:5000/api/users/login",
           "POST",
           JSON.stringify({
@@ -73,11 +73,12 @@ const Auth = () => {
             "Content-Type": "application/json",
           }
         );
-        auth.login();
+        auth.login(responseData.user._id);
+        console.log(responseData.user._id);
       } catch (err) {}
     } else {
       try {
-        await sendRequest(
+        const responseData = await sendRequest(
           "http://localhost:5000/api/users/signup",
           "POST",
           JSON.stringify({
@@ -89,18 +90,13 @@ const Auth = () => {
             "Content-Type": "application/json",
           }
         );
-
         
-        auth.login();
-      } catch (err) {
- 
-      }
+        console.log(responseData.user.id);
+        auth.login(responseData.user.id);
+      } catch (err) {}
     }
- 
     console.log(formState.inputs);
   };
-
-
 
   return (
     <React.Fragment>
