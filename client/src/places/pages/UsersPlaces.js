@@ -1,56 +1,42 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import PlaceList from "../components/PlaceList";
+import { useHttpClient } from "../../shared/hooks/http-hook";
+
 import Button from "../../shared/components/FormElements/Button";
 
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 
-const DUMMY_PLACES=[
-    {
-        id :'p1',
-        title :'Empire State',
-        description : 'one of the most famout Skycrapers of all time',
-        imageUrl:'https://media.istockphoto.com/id/496799869/es/foto/el-edificio-empire-state.jpg?s=1024x1024&w=is&k=20&c=VnfXeECkcuZcd-hKD5dVIXkhO2NTaPLQiMqduqoFAjk=',
-        address:'20 W 34th St., New York, NY 10001, United States',
-        location: {
-            lat: 40.7484445,
-            lng: -73.9882393
-        },
-        creator:'u1'
-    },
+const UsersPlaces = () => {
+  const [loadedPlaces, setLoadedPlaces] = useState();
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const userId = useParams().userId;
+  console.log(userId);
 
-    {
-        id :'p2',
-        title :'Empire State',
-        description : 'one of the most famout Skycrapers of all time',
-        imageUrl:'https://media.istockphoto.com/id/496799869/es/foto/el-edificio-empire-state.jpg?s=1024x1024&w=is&k=20&c=VnfXeECkcuZcd-hKD5dVIXkhO2NTaPLQiMqduqoFAjk=',
-        address:'20 W 34th St., New York, NY 10001, United States',
-        location: {
-            lat: 40.7484445,
-            lng: -73.9882393
-        },
-        creator:'u2'
-    },
+  useEffect(() => {
+    const fetchPlaces = async () => {
+      try {
+        const responseData = await sendRequest(
+          `http://localhost:5000/api/places/user/${userId}`
+        );
+        setLoadedPlaces(responseData.places);
+      } catch (error) {}
+    };
 
-    {
-        id :'p3',
-        title :'Colosseum ',
-        description : 'The Colosseum - A Timeless Marvel of Ancient Rome!',
-        imageUrl:'https://media.istockphoto.com/id/622806180/es/foto/coliseo-de-roma-al-anochecer.jpg?s=1024x1024&w=is&k=20&c=4IOhIyqTCiZQyOsrjSsOf45en2KYr1PYypdvYUawsQQ=',
-        address:'Piazza del Colosseo, 1, 00184 Roma RM, Italy',
-        location: {
-            lat: 41.8902142,
-            lng: 12.489656
-        },
-        creator:'u1'
-    }
-];
+    fetchPlaces();
+  }, [sendRequest, userId]);
 
-const UsersPlaces =()=>{
-
-    const userId = useParams().userId;
-    const loadedPlaces = DUMMY_PLACES.filter(place => place.creator === userId)
-    return <PlaceList items={loadedPlaces}/>
+  return (
+    <React.Fragment>
+        <ErrorModal error={error} onClear={clearError}/>
+        {isLoading && <div className="center">
+            <LoadingSpinner />
+            </div>}
+      {!isLoading && loadedPlaces && <PlaceList items={loadedPlaces} />}
+    </React.Fragment>
+  );
 };
 
 export default UsersPlaces;

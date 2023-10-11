@@ -32,6 +32,7 @@ const getPlacesByUserId = async (req, res, next) => {
   let userWithPlaces;
   try {
     userWithPlaces = await User.findById(userId).populate('places');
+    console.log(userId);
   } catch (err) {
     const error = new HttpError(`could not find the place with that ID + ${err}`, 500);
     return next(error);
