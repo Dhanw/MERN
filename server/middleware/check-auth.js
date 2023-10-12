@@ -3,6 +3,12 @@ const jwt = require("jsonwebtoken");
 const HttpError = require("../models/http-error");
 
 module.exports = (req, res, next) => {
+    //without this line we Will get an error at post. This some browser behavior.
+if(req.method === 'OPTIONS'){
+    return next();
+}
+
+
   // this line is for split the toke, in the headers should be like authorization: 'Bearer TOKEN' so that is why we need to split the value
 
   try {

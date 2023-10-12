@@ -42,7 +42,7 @@ const signup = async (req, res, next) => {
   try {
     hashPassword = await bcrypt.hash(password, 12);
   } catch (err) {
-    const error = new HttpError("coulld not create the passsword", 500);
+    const error = new HttpError("could not create the passsword", 500);
     return next(error);
   }
 
@@ -50,7 +50,7 @@ const signup = async (req, res, next) => {
     name,
     email,
     image: req.file.path,
-    password,
+    password:hashPassword,
     places: [],
   });
 
@@ -110,14 +110,16 @@ const login = async (req, res, next) => {
   }
 
   if (!isValidPassword) {
-    return next(new HttpError("could not login the credentials", 401));
+    return next(new HttpError("could not login with the credentials", 401));
   }
+
+  //console.log(existingUser._id);
 
   let token;
   try {
     token = jwt.sign(
       {
-        userId: existingUser.id,
+        userId: existingUser._id,
         email: existingUser.email,
       },
       "secret_dont_share",
@@ -129,7 +131,7 @@ const login = async (req, res, next) => {
   }
 
   res.json({
-    userId: existingUser.id,
+    userId: existingUser._id,
     email: existingUser.email,
     token:token
   });
