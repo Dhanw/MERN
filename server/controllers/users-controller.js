@@ -18,12 +18,13 @@ const signup = async (req, res, next) => {
   const error = validationResult(req);
 
   if (!error.isEmpty()) {
+
     console.log(error);
     return next(new HttpError("invalid inputs please try again", 422));
   }
 
   const { name, email, password } = req.body;
-  
+
   let existingUser;
   try {
     existingUser = await User.findOne({ email: email });
@@ -39,8 +40,7 @@ const signup = async (req, res, next) => {
   const createdUser = new User({
     name,
     email,
-    image:
-      "https://www.shutterstock.com/shutterstock/photos/2275817317/display_1500/stock-photo-happy-man-standing-on-road-in-front-of-trees-2275817317.jpg",
+    image: req.file.path,
     password,
     places: [],
   });
