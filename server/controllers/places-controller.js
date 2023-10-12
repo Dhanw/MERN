@@ -5,6 +5,7 @@ const getCoordsForAddress = require("../util/location");
 const Place = require("../models/place");
 const User = require("../models/user");
 const mongoose = require("mongoose");
+const fs = require('fs');
 
 const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
@@ -31,10 +32,13 @@ const getPlacesByUserId = async (req, res, next) => {
 
   let userWithPlaces;
   try {
-    userWithPlaces = await User.findById(userId).populate('places');
+    userWithPlaces = await User.findById(userId).populate("places");
     console.log(userId);
   } catch (err) {
-    const error = new HttpError(`could not find the place with that ID + ${err}`, 500);
+    const error = new HttpError(
+      `could not find the place with that ID + ${err}`,
+      500
+    );
     return next(error);
   }
 
@@ -42,7 +46,11 @@ const getPlacesByUserId = async (req, res, next) => {
     return next(new HttpError("could not find a place for the user id", 404));
   }
 
-  res.json({places: userWithPlaces.places.map((place) => place.toObject({gatters:true}))});
+  res.json({
+    places: userWithPlaces.places.map((place) =>
+      place.toObject({ gatters: true })
+    ),
+  });
 };
 
 const createPlace = async (req, res, next) => {
@@ -151,10 +159,12 @@ const deletePlace = async (req, res, next) => {
     return next(error);
   }
 
+  const imagePath = place.image;
+
   try {
     const sess = await mongoose.startSession();
     sess.startTransaction();
-    await place.deleteOne({session:sess}); //needed to this function instead of places.remove. It seems that it is depracated.
+    await place.deleteOne({ session: sess }); //needed to this function instead of places.remove. It seems that it is depracated.
     place.creator.places.pull(place);
     await place.creator.save({ session: sess });
     await sess.commitTransaction();
@@ -162,6 +172,10 @@ const deletePlace = async (req, res, next) => {
     const error = new HttpError(`Could not delete the place + ${err}`, 500);
     return next(error);
   }
+
+  fs.unlink(imagePath,err=>{
+    console.log(err);
+  })
 
   res.status(200).json({ message: "place deleted yeah!!" });
 };
