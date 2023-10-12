@@ -130,6 +130,10 @@ const updatePlace = async (req, res, next) => {
     return next(error);
   }
 
+  if(place.creator.toString() !== req.userData.userId){
+    return next(new HttpError('you cannot edit  this place. ',401));
+  }
+
   place.title = title;
   place.description = description;
 
@@ -157,6 +161,12 @@ const deletePlace = async (req, res, next) => {
   if (!place) {
     const error = new HttpError("could not delete the place with the ID", 404);
     return next(error);
+  }
+
+  console.log(place.creator._id)
+  if(place.creator._id.toString() !== req.userData.userId){
+    console.log(place.creator._id)
+    return next(new HttpError('you cannot delete  this place. ',401));
   }
 
   const imagePath = place.image;
