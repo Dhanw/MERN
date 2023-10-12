@@ -67,8 +67,7 @@ const createPlace = async (req, res, next) => {
     description,
     address,
     location: coordinates,
-    image:
-      "https://media.istockphoto.com/id/626591042/es/foto/edificio-empire-state-de-la-ciudad-de-nueva-york.jpg?s=612x612&w=is&k=20&c=Vp-AWuYwb3PTM6PjuZrc5WYyo5UAUfGXXovbEa5gtT4=",
+    image: req.file.path,
     creator,
   });
 
