@@ -22,19 +22,30 @@ const UsersPlaces = () => {
           `http://localhost:5000/api/places/user/${userId}`
         );
         setLoadedPlaces(responseData.places);
+        console.log(responseData.places);
       } catch (error) {}
     };
 
     fetchPlaces();
   }, [sendRequest, userId]);
 
+  const placeDeletedHandler = (deletedPlaceId) => {
+    setLoadedPlaces((prevPlaces) =>
+      prevPlaces.filter((place) => place.id !== deletedPlaceId)
+    );
+  };
+
   return (
     <React.Fragment>
-        <ErrorModal error={error} onClear={clearError}/>
-        {isLoading && <div className="center">
-            <LoadingSpinner />
-            </div>}
-      {!isLoading && loadedPlaces && <PlaceList items={loadedPlaces} />}
+      <ErrorModal error={error} onClear={clearError} />
+      {isLoading && (
+        <div className="center">
+          <LoadingSpinner />
+        </div>
+      )}
+      {!isLoading && loadedPlaces && (
+        <PlaceList items={loadedPlaces} onDeletePlace={placeDeletedHandler} />
+      )}
     </React.Fragment>
   );
 };
