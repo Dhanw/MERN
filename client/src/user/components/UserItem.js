@@ -1,16 +1,18 @@
-import React from "react";
+import React,{useContext} from "react";
 import {Link} from 'react-router-dom'
 
 import './UserItem.css'; 
 import Avatar from '../../shared/components/UIElements/Avatar'
 import Card from '../../shared/components/UIElements/Card'
 import reactRouterDom from "react-router-dom";
+import { AuthContext } from "../../shared/context/auth-context";
 
 const UsersItem = props=>{
+    const auth = useContext(AuthContext);
     return (
         <li className="user-item">
                 <Card className="user-item__content"> 
-                    <Link to={`/${props.id}/places`} >
+                    <Link to={`/places/user/${props.id}`} >
                         <div className="user-item__image">
                             <Avatar image={props.image} alt={props.name} />
                         </div>

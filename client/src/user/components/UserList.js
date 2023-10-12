@@ -17,7 +17,7 @@ const UsersList = props=>{
         {props.items.map(user=>{
             return <UsersItem 
             key={user.id} 
-            id={user.id} 
+            id={user._id} 
             image={user.image} 
             name={user.name} 
             placeCount = {user.places.length}
