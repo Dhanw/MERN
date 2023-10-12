@@ -2,6 +2,8 @@ const { v4: uuid } = require("uuid");
 const HttpError = require("../models/http-error");
 const { validationResult } = require("express-validator");
 const User = require("../models/user");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const getUsers = async (req, res, next) => {
   let users;
@@ -18,7 +20,6 @@ const signup = async (req, res, next) => {
   const error = validationResult(req);
 
   if (!error.isEmpty()) {
-
     console.log(error);
     return next(new HttpError("invalid inputs please try again", 422));
   }
@@ -37,6 +38,14 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
+  let hashPassword;
+  try {
+    hashPassword = await bcrypt.hash(password, 12);
+  } catch (err) {
+    const error = new HttpError("coulld not create the passsword", 500);
+    return next(error);
+  }
+
   const createdUser = new User({
     name,
     email,
@@ -48,11 +57,29 @@ const signup = async (req, res, next) => {
   try {
     await createdUser.save();
   } catch (err) {
-    const error = new HttpError("Signing up  falied", 422);
+    const error = new HttpError("Signing up  falied", 500);
     return next(error);
   }
 
-  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
+  // authentication done using jwt
+  let token;
+  try {
+    token = jwt.sign(
+      {
+        userId: createdUser.id,
+        email: createdUser.email,
+      },
+      "secret_dont_share",
+      { expiresIn: "1h" }
+    );
+  } catch (err) {
+    const error = new HttpError("Signing up  falied", 500);
+    return next(error);
+  }
+
+  res
+    .status(201)
+    .json({ userId: createdUser.id, email: createdUser.email, token: token });
 };
 
 const login = async (req, res, next) => {
@@ -70,16 +97,42 @@ const login = async (req, res, next) => {
     return next(new HttpError("Sign up failed", 422));
   }
 
-  if (!existingUser || existingUser.password !== password) {
+  if (!existingUser) {
     const error = new HttpError("Invalid credentialas  user", 422);
     return next(error);
   }
 
-  res.json({
-    message: "Logged in",
-    user: existingUser.toObject({ gatters: true }),
-  });
+  let isValidPassword = false;
+  try {
+    isValidPassword = await bcrypt.compare(password, existingUser.password);
+  } catch (error) {
+    return next(new HttpError("could not login the credentials", 500));
+  }
 
+  if (!isValidPassword) {
+    return next(new HttpError("could not login the credentials", 401));
+  }
+
+  let token;
+  try {
+    token = jwt.sign(
+      {
+        userId: existingUser.id,
+        email: existingUser.email,
+      },
+      "secret_dont_share",
+      { expiresIn: "1h" }
+    );
+  } catch (err) {
+    const error = new HttpError("Loggin in up  falied", 500);
+    return next(error);
+  }
+
+  res.json({
+    userId: existingUser.id,
+    email: existingUser.email,
+    token:token
+  });
 };
 
 exports.getUsers = getUsers;
