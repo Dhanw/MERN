@@ -40,7 +40,7 @@ const Auth = () => {
         {
           ...formState.inputs,
           name: undefined,
-          image:undefined
+          image: undefined,
         },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
@@ -52,10 +52,10 @@ const Auth = () => {
             value: "",
             isValid: false,
           },
-          image:{
-            value:null,
-            isValid:false
-          }
+          image: {
+            value: null,
+            isValid: false,
+          },
         },
         false
       );
@@ -64,7 +64,7 @@ const Auth = () => {
   };
 
   const authSubmitHandler = async (event) => {
-    console.log(formState.inputs)
+    console.log(formState.inputs);
     event.preventDefault();
 
     if (isLoginMode) {
@@ -85,19 +85,17 @@ const Auth = () => {
       } catch (err) {}
     } else {
       try {
+        const formData = new FormData();
+        formData.append('email',formState.inputs.email.value);
+        formData.append('name',formState.inputs.name.value);
+        formData.append('password',formState.inputs.password.value);
+        formData.append('image',formState.inputs.image.value);
         const responseData = await sendRequest(
           "http://localhost:5000/api/users/signup",
           "POST",
-          JSON.stringify({
-            name: formState.inputs.name.value,
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value,
-          }),
-          {
-            "Content-Type": "application/json",
-          }
+          formData,
         );
-        
+
         console.log(responseData.user.id);
         auth.login(responseData.user.id);
       } catch (err) {}
@@ -125,7 +123,9 @@ const Auth = () => {
             />
           )}
 
-          {!isLoginMode && <ImageUpload center id="image" onInput={inputHandler}/>}
+          {!isLoginMode && (
+            <ImageUpload center id="image" onInput={inputHandler} />
+          )}
           <Input
             element="input"
             id="email"
