@@ -17,7 +17,7 @@ if(req.method === 'OPTIONS'){
       throw new HttpError("Authentication failed", 401);
     }
 
-    const decodedToken = jwt.verify(token, "secret_dont_share");
+    const decodedToken = jwt.verify(token, process.env.JWT_KEY);
     req.userData = {
       userId: decodedToken.userId
     };
