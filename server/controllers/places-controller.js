@@ -60,7 +60,7 @@ const createPlace = async (req, res, next) => {
     return next(new HttpError("invalid inputs please try again", 422));
   }
 
-  const { title, description, address, creator } = req.body;
+  const { title, description, address } = req.body; // creator
 
   let coordinates;
   try {
@@ -76,12 +76,13 @@ const createPlace = async (req, res, next) => {
     address,
     location: coordinates,
     image: req.file.path,
-    creator,
+    creator: req.userData.userId, // remove this line
   });
 
+  console.log("This is the Id of the creator " + req.userData.userId)
   let user;
   try {
-    user = await User.findById(creator);
+    user = await User.findById(req.userData.userId); // I need to use the data in the request that I add in the first middleware, in specific the check-auth middleware. 
   } catch (err) {
     const error = new HttpError(
       "creating place falied, user id was not found",
